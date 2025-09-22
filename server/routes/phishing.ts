@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { PhishingAnalyzeRequest, PhishingAnalyzeResponse } from "@shared/api";
-import { analyzeUrl } from "@shared/security";
+import { analyzeUrl } from "../../shared/security";
 
 const parseList = (v?: string) => (v ? v.split(",").map((s) => s.trim()).filter(Boolean) : []);
 
