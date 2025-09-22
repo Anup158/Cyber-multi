@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { analyzeUrl, normalizeUrl } from "@shared/security";
 import { ShieldAlert, ShieldCheck, Link as LinkIcon } from "lucide-react";
+import { addHistory } from "@/lib/history";
+import { RecentList } from "@/components/history/RecentList";
 
 export default function Phishing() {
   const [url, setUrl] = useState("");
@@ -44,7 +46,11 @@ export default function Phishing() {
                   const resp = await fetch("/api/phishing/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: current }) });
                   if (resp.ok) {
                     const data = await resp.json();
-                    if (data?.normalizedUrl) setUrl(data.normalizedUrl);
+                    const normalized = data?.normalizedUrl || current;
+                    setUrl(normalized);
+                    if (data?.risk && typeof data.score === "number") {
+                      addHistory("phishing", { url: normalized, risk: data.risk, score: data.score });
+                    }
                   }
                 } catch {}
               }}>Run</Button>
@@ -80,6 +86,7 @@ export default function Phishing() {
             )}
           </CardContent>
         </Card>
+        <RecentList type="phishing" />
       </div>
     </section>
   );
