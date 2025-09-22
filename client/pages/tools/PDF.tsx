@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { addHistory } from "@/lib/history";
+import { RecentList } from "@/components/history/RecentList";
 
 const SIGNS = ["/JavaScript", "/OpenAction", "/AA", "/JS", "/Launch", "/EmbeddedFile", "/RichMedia"];
 
@@ -20,6 +22,9 @@ export default function PDF() {
       if (resp.ok) {
         const data = await resp.json();
         setReport({ name: data.name || file.name, size: data.size || file.size, hits: data.hits });
+        if (typeof data.score === "number" && data.risk) {
+          addHistory("pdf", { name: data.name || file.name, score: data.score, risk: data.risk });
+        }
       }
     } catch {}
   }
@@ -58,6 +63,7 @@ export default function PDF() {
             )}
           </CardContent>
         </Card>
+        <RecentList type="pdf" />
       </div>
     </section>
   );
