@@ -2,7 +2,13 @@ import { RequestHandler } from "express";
 import { PhishingAnalyzeRequest, PhishingAnalyzeResponse } from "@shared/api";
 import { analyzeUrl } from "../../shared/security";
 
-const parseList = (v?: string) => (v ? v.split(",").map((s) => s.trim()).filter(Boolean) : []);
+const parseList = (v?: string) =>
+  v
+    ? v
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
 
 export const handlePhishingAnalyze: RequestHandler = (req, res) => {
   const body = req.body as PhishingAnalyzeRequest;
