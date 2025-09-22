@@ -13,6 +13,7 @@ import Phishing from "./pages/tools/Phishing";
 import QR from "./pages/tools/QR";
 import PDF from "./pages/tools/PDF";
 import Stego from "./pages/tools/Stego";
+import Activity from "./pages/Activity";
 import { SiteHeader } from "@/components/layout/Header";
 import { SiteFooter } from "@/components/layout/Footer";
 
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/tools/qr" element={<QR />} />
               <Route path="/tools/pdf" element={<PDF />} />
               <Route path="/tools/stego" element={<Stego />} />
+              <Route path="/activity" element={<Activity />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

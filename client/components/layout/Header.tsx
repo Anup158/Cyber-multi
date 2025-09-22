@@ -8,6 +8,7 @@ export function SiteHeader() {
   const nav = [
     { to: "/", label: "Home" },
     { to: "/tools", label: "Tools" },
+    { to: "/activity", label: "Activity" },
   ];
 
   return (
