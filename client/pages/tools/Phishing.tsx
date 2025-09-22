@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { analyzeUrl, normalizeUrl } from "@/lib/security";
+import { analyzeUrl, normalizeUrl } from "@shared/security";
 import { ShieldAlert, ShieldCheck, Link as LinkIcon } from "lucide-react";
 
 export default function Phishing() {
@@ -37,7 +37,17 @@ export default function Phishing() {
                 onChange={(e) => setUrl(e.target.value)}
                 autoFocus
               />
-              <Button onClick={() => setUrl((v) => v.trim())}>Run</Button>
+              <Button onClick={async () => {
+                const current = url.trim();
+                setUrl(current);
+                try {
+                  const resp = await fetch("/api/phishing/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: current }) });
+                  if (resp.ok) {
+                    const data = await resp.json();
+                    if (data?.normalizedUrl) setUrl(data.normalizedUrl);
+                  }
+                } catch {}
+              }}>Run</Button>
             </div>
             {analysis && (
               <div className="space-y-4">
