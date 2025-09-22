@@ -14,6 +14,14 @@ export default function PDF() {
     const text = new TextDecoder("latin1").decode(new Uint8Array(ab));
     const hits = SIGNS.map((token) => ({ token, count: (text.match(new RegExp(token, "g")) || []).length }));
     setReport({ name: file.name, size: file.size, hits });
+    try {
+      const base64 = btoa(String.fromCharCode(...new Uint8Array(ab)));
+      const resp = await fetch("/api/pdf/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ base64, name: file.name }) });
+      if (resp.ok) {
+        const data = await resp.json();
+        setReport({ name: data.name || file.name, size: data.size || file.size, hits: data.hits });
+      }
+    } catch {}
   }
 
   const score = report ? Math.min(100, report.hits.reduce((s, h) => s + (h.count > 0 ? (h.token === "/JavaScript" || h.token === "/Launch" ? 35 : 15) : 0), 0)) : 0;
