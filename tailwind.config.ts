@@ -63,6 +63,9 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        glow: "0 0 0 2px hsl(var(--background)), 0 0 24px 0 rgba(34, 211, 238, 0.45)",
+      },
       keyframes: {
         "accordion-down": {
           from: {
@@ -80,10 +83,15 @@ export default {
             height: "0",
           },
         },
+        glow: {
+          from: { boxShadow: "0 0 0 2px hsl(var(--background)), 0 0 0 0 rgba(34,211,238,0.0)" },
+          to: { boxShadow: "0 0 0 2px hsl(var(--background)), 0 0 30px 6px rgba(34,211,238,0.4)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        glow: "glow 2.5s ease-in-out infinite alternate",
       },
     },
   },
