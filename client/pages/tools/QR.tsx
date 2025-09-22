@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { analyzeUrl } from "@shared/security";
+import { addHistory } from "@/lib/history";
+import { RecentList } from "@/components/history/RecentList";
 
 export default function QR() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -42,7 +44,9 @@ export default function QR() {
         // @ts-ignore
         const results = await detector.detect(v);
         if (results && results[0]) {
-          setDecoded(results[0].rawValue || "");
+          const value = results[0].rawValue || "";
+          setDecoded(value);
+          addHistory("qr", { content: value });
         }
       } catch {}
       requestAnimationFrame(tick);
@@ -61,7 +65,7 @@ export default function QR() {
         const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
         const bmp = await createImageBitmap(file);
         const rs = await detector.detect(bmp as any);
-        if (rs && rs[0]) setDecoded(rs[0].rawValue || "");
+        if (rs && rs[0]) { const v = rs[0].rawValue || ""; setDecoded(v); addHistory("qr", { content: v }); }
       }
     } catch (err) {
       console.error(err);
@@ -106,6 +110,7 @@ export default function QR() {
             )}
           </CardContent>
         </Card>
+      <RecentList type="qr" />
       </div>
     </section>
   );
