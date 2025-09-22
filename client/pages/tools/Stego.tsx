@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { addHistory } from "@/lib/history";
+import { RecentList } from "@/components/history/RecentList";
 
 function shannonEntropy(data: Uint8ClampedArray) {
   const hist = new Array(256).fill(0);
@@ -36,6 +38,8 @@ export default function Stego() {
     const pixels = ctx.getImageData(0, 0, img.width, img.height).data;
     const H = shannonEntropy(pixels);
     setResult({ name: file.name, entropy: H });
+    const risk = H > 7.5 ? "high" : H > 7.0 ? "medium" : "low";
+    addHistory("stego", { name: file.name, entropy: H, risk });
   }
 
   const risk = result ? (result.entropy > 7.5 ? "high" : result.entropy > 7.0 ? "medium" : "low") : "low";
@@ -62,6 +66,7 @@ export default function Stego() {
             <p className="text-xs text-foreground/60">Entropy alone cannot confirm steganography; use alongside format-specific detectors for accuracy.</p>
           </CardContent>
         </Card>
+        <RecentList type="stego" />
       </div>
     </section>
   );
