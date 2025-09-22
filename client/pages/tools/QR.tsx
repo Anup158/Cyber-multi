@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { analyzeUrl } from "@/lib/security";
+import { analyzeUrl } from "@shared/security";
 
 export default function QR() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
