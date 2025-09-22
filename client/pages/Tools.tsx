@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, QrCode, FileWarning, ImageOff, Rocket } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
   {
@@ -8,24 +9,28 @@ const features = [
     desc: "Analyze URLs, HTML and headers to detect credential harvesting and brand impersonation.",
     icon: ShieldCheck,
     action: "Scan URL",
+    to: "/tools/phishing",
   },
   {
     title: "QR Scanner",
     desc: "Decode QR content safely in-browser and validate for malicious redirects.",
     icon: QrCode,
     action: "Scan QR",
+    to: "/tools/qr",
   },
   {
     title: "Malicious PDF Scanner",
     desc: "Static analysis for embedded JavaScript, suspicious objects and known exploit signatures.",
     icon: FileWarning,
     action: "Scan PDF",
+    to: "/tools/pdf",
   },
   {
     title: "Steganography Detection",
     desc: "Detect hidden payloads and anomalous entropy in common image formats.",
     icon: ImageOff,
     action: "Scan Image",
+    to: "/tools/stego",
   },
 ];
 
@@ -39,7 +44,7 @@ export default function Tools() {
             Unified tools. One platform.
           </h1>
           <p className="mt-3 text-foreground/70">
-            Start with any module below. These pages are placeholders — tell me which one to implement first and we’ll build it next.
+            Start with any module below.
           </p>
         </div>
 
@@ -54,12 +59,9 @@ export default function Tools() {
                 <CardDescription className="text-foreground/70">{f.desc}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="secondary" className="w-full justify-center border border-border/60 bg-white/5 text-foreground hover:bg-white/10">
-                  <Rocket className="mr-2 h-4 w-4" /> {f.action}
+                <Button asChild variant="secondary" className="w-full justify-center border border-border/60 bg-white/5 text-foreground hover:bg-white/10">
+                  <Link to={f.to}><Rocket className="mr-2 h-4 w-4" /> {f.action}</Link>
                 </Button>
-                <p className="mt-3 text-xs text-foreground/60">
-                  Placeholder page. Ask to implement this feature next for real scans.
-                </p>
               </CardContent>
             </Card>
           ))}
