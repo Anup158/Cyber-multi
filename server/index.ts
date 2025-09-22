@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { handlePhishingAnalyze } from "./routes/phishing";
+import { handlePdfAnalyze } from "./routes/pdf";
 
 export function createServer() {
   const app = express();
@@ -18,6 +20,10 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Security APIs
+  app.post("/api/phishing/analyze", handlePhishingAnalyze);
+  app.post("/api/pdf/analyze", handlePdfAnalyze);
 
   return app;
 }
