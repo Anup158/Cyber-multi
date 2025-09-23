@@ -7,5 +7,7 @@ export async function fetchBinary(url: string): Promise<Blob> {
   if (!resp.ok) throw new Error("Proxy fetch failed");
   const data = await resp.json();
   const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
-  return new Blob([bytes], { type: data.contentType || "application/octet-stream" });
+  return new Blob([bytes], {
+    type: data.contentType || "application/octet-stream",
+  });
 }

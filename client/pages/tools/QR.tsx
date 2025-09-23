@@ -21,7 +21,9 @@ export default function QR() {
 
   async function startCamera() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
@@ -67,14 +69,19 @@ export default function QR() {
         const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
         const bmp = await createImageBitmap(file);
         const rs = await detector.detect(bmp as any);
-        if (rs && rs[0]) { const v = rs[0].rawValue || ""; setDecoded(v); addHistory("qr", { content: v }); }
+        if (rs && rs[0]) {
+          const v = rs[0].rawValue || "";
+          setDecoded(v);
+          addHistory("qr", { content: v });
+        }
       }
     } catch (err) {
       console.error(err);
     }
   }
 
-  const insight = decoded && /^(https?:)?\//.test(decoded) ? analyzeUrl(decoded) : null;
+  const insight =
+    decoded && /^(https?:)?\//.test(decoded) ? analyzeUrl(decoded) : null;
 
   async function scanUrlImage() {
     if (!imageUrl) return;
@@ -86,9 +93,15 @@ export default function QR() {
         const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
         const bmp = await createImageBitmap(await blob);
         const rs = await detector.detect(bmp as any);
-        if (rs && rs[0]) { const v = rs[0].rawValue || ""; setDecoded(v); addHistory("qr", { content: v }); }
+        if (rs && rs[0]) {
+          const v = rs[0].rawValue || "";
+          setDecoded(v);
+          addHistory("qr", { content: v });
+        }
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -97,13 +110,20 @@ export default function QR() {
     if (file) onUpload({ target: { files: [file] } } as any);
     else {
       const text = e.dataTransfer.getData("text");
-      if (text) { setImageUrl(text); scanUrlImage(); }
+      if (text) {
+        setImageUrl(text);
+        scanUrlImage();
+      }
     }
   }
 
   async function onPaste(e: React.ClipboardEvent<HTMLDivElement>) {
     const t = e.clipboardData.getData("text");
-    if (t) { setImageUrl(t); await scanUrlImage(); return; }
+    if (t) {
+      setImageUrl(t);
+      await scanUrlImage();
+      return;
+    }
     const items = e.clipboardData.items;
     for (const it of items as any) {
       if (it.type && it.type.startsWith("image/")) {
@@ -118,23 +138,52 @@ export default function QR() {
       <div className="mx-auto max-w-3xl space-y-6">
         <div>
           <h1 className="text-2xl font-bold">QR Scanner</h1>
-          <p className="text-sm text-foreground/70">Scan QR codes using your camera or upload an image. If the content is a URL, we’ll analyze it for phishing risk.</p>
+          <p className="text-sm text-foreground/70">
+            Scan QR codes using your camera or upload an image. If the content
+            is a URL, we’ll analyze it for phishing risk.
+          </p>
         </div>
         <Card className="border-border/60">
           <CardHeader>
             <CardTitle>Scan</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3" onDrop={onDrop} onDragOver={(e)=>e.preventDefault()} onPaste={onPaste}>
+          <CardContent
+            className="space-y-3"
+            onDrop={onDrop}
+            onDragOver={(e) => e.preventDefault()}
+            onPaste={onPaste}
+          >
             <div className="flex flex-wrap items-center gap-2">
               {supported && (
-                <Button onClick={startCamera}>{streaming ? "Scanning…" : "Start Camera"}</Button>
+                <Button onClick={startCamera}>
+                  {streaming ? "Scanning…" : "Start Camera"}
+                </Button>
               )}
-              <div className="text-sm text-foreground/60">upload/paste/drag image • or scan by image URL</div>
-              <Input type="file" accept="image/*" onChange={onUpload} className="max-w-xs" />
-              <Input placeholder="https://...image.png" value={imageUrl} onChange={(e)=>setImageUrl(e.target.value)} className="max-w-sm" />
-              <Button variant="secondary" onClick={scanUrlImage}>Scan URL</Button>
+              <div className="text-sm text-foreground/60">
+                upload/paste/drag image • or scan by image URL
+              </div>
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={onUpload}
+                className="max-w-xs"
+              />
+              <Input
+                placeholder="https://...image.png"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="max-w-sm"
+              />
+              <Button variant="secondary" onClick={scanUrlImage}>
+                Scan URL
+              </Button>
             </div>
-            <video ref={videoRef} className="mt-2 w-full rounded-md border border-border/60" muted playsInline />
+            <video
+              ref={videoRef}
+              className="mt-2 w-full rounded-md border border-border/60"
+              muted
+              playsInline
+            />
             {decoded && (
               <div className="rounded-md border border-border/60 bg-white/5 p-3 text-sm">
                 <div className="font-medium">Decoded</div>
@@ -142,16 +191,21 @@ export default function QR() {
               </div>
             )}
             {insight && (
-              <div className={`rounded-md border p-3 text-sm ${insight.risk === "high" ? "border-red-500/30 bg-red-500/5 text-red-400" : insight.risk === "medium" ? "border-amber-500/30 bg-amber-500/5 text-amber-400" : "border-emerald-500/30 bg-emerald-500/5 text-emerald-400"}`}>
+              <div
+                className={`rounded-md border p-3 text-sm ${insight.risk === "high" ? "border-red-500/30 bg-red-500/5 text-red-400" : insight.risk === "medium" ? "border-amber-500/30 bg-amber-500/5 text-amber-400" : "border-emerald-500/30 bg-emerald-500/5 text-emerald-400"}`}
+              >
                 URL risk: {insight.risk} (score {insight.score})
               </div>
             )}
             {!supported && (
-              <div className="text-xs text-foreground/60">BarcodeDetector is not supported in this browser. Upload an image instead.</div>
+              <div className="text-xs text-foreground/60">
+                BarcodeDetector is not supported in this browser. Upload an
+                image instead.
+              </div>
             )}
           </CardContent>
         </Card>
-      <RecentList type="qr" />
+        <RecentList type="qr" />
       </div>
     </section>
   );

@@ -7,13 +7,16 @@ export const handleFetchBinary: RequestHandler = async (req, res) => {
     const { url } = req.body as { url?: string };
     if (!url) return res.status(400).json({ error: "Missing url" });
     const u = new URL(url);
-    if (!/^https?:$/.test(u.protocol)) return res.status(400).json({ error: "Only http/https allowed" });
+    if (!/^https?:$/.test(u.protocol))
+      return res.status(400).json({ error: "Only http/https allowed" });
 
     const resp = await fetch(u.toString(), { redirect: "follow" });
-    if (!resp.ok || !resp.body) return res.status(400).json({ error: `Fetch failed: ${resp.status}` });
+    if (!resp.ok || !resp.body)
+      return res.status(400).json({ error: `Fetch failed: ${resp.status}` });
 
     const arrayBuffer = await resp.arrayBuffer();
-    if (arrayBuffer.byteLength > MAX_BYTES) return res.status(413).json({ error: "File too large" });
+    if (arrayBuffer.byteLength > MAX_BYTES)
+      return res.status(413).json({ error: "File too large" });
 
     const ct = resp.headers.get("content-type") || "application/octet-stream";
     const base64 = Buffer.from(arrayBuffer).toString("base64");

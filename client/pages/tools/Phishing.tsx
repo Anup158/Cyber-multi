@@ -12,18 +12,42 @@ export default function Phishing() {
   const [url, setUrl] = useState("");
   const analysis = useMemo(() => (url ? analyzeUrl(url) : null), [url]);
 
-  const color = analysis?.risk === "high" ? "text-red-400" : analysis?.risk === "medium" ? "text-amber-400" : "text-emerald-400";
+  const color =
+    analysis?.risk === "high"
+      ? "text-red-400"
+      : analysis?.risk === "medium"
+        ? "text-amber-400"
+        : "text-emerald-400";
 
   return (
     <section className="container py-10">
-      <div className="mx-auto max-w-3xl" onPaste={(e)=>{ const t=e.clipboardData.getData('text'); if(t){ setUrl(t); } }} onDrop={(e)=>{ e.preventDefault(); const t=e.dataTransfer.getData('text'); if(t){ setUrl(t); } }} onDragOver={(e)=>e.preventDefault()}>
+      <div
+        className="mx-auto max-w-3xl"
+        onPaste={(e) => {
+          const t = e.clipboardData.getData("text");
+          if (t) {
+            setUrl(t);
+          }
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          const t = e.dataTransfer.getData("text");
+          if (t) {
+            setUrl(t);
+          }
+        }}
+        onDragOver={(e) => e.preventDefault()}
+      >
         <div className="flex items-center gap-3">
           <div className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 text-cyan-400 ring-1 ring-inset ring-cyan-500/30">
             <LinkIcon className="h-5 w-5" />
           </div>
           <div>
             <h1 className="text-2xl font-bold">Phishing URL Analysis</h1>
-            <p className="text-sm text-foreground/70">Paste a URL to evaluate risk using static heuristics. Runs completely in your browser.</p>
+            <p className="text-sm text-foreground/70">
+              Paste a URL to evaluate risk using static heuristics. Runs
+              completely in your browser.
+            </p>
           </div>
         </div>
 
@@ -39,21 +63,33 @@ export default function Phishing() {
                 onChange={(e) => setUrl(e.target.value)}
                 autoFocus
               />
-              <Button onClick={async () => {
-                const current = url.trim();
-                setUrl(current);
-                try {
-                  const resp = await fetch("/api/phishing/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: current }) });
-                  if (resp.ok) {
-                    const data = await resp.json();
-                    const normalized = data?.normalizedUrl || current;
-                    setUrl(normalized);
-                    if (data?.risk && typeof data.score === "number") {
-                      addHistory("phishing", { url: normalized, risk: data.risk, score: data.score });
+              <Button
+                onClick={async () => {
+                  const current = url.trim();
+                  setUrl(current);
+                  try {
+                    const resp = await fetch("/api/phishing/analyze", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ url: current }),
+                    });
+                    if (resp.ok) {
+                      const data = await resp.json();
+                      const normalized = data?.normalizedUrl || current;
+                      setUrl(normalized);
+                      if (data?.risk && typeof data.score === "number") {
+                        addHistory("phishing", {
+                          url: normalized,
+                          risk: data.risk,
+                          score: data.score,
+                        });
+                      }
                     }
-                  }
-                } catch {}
-              }}>Run</Button>
+                  } catch {}
+                }}
+              >
+                Run
+              </Button>
             </div>
             {analysis && (
               <div className="space-y-4">
@@ -63,9 +99,13 @@ export default function Phishing() {
                   ) : (
                     <ShieldCheck className="h-4 w-4" />
                   )}
-                  <AlertTitle className="capitalize">{analysis.risk} risk — score {analysis.score}</AlertTitle>
+                  <AlertTitle className="capitalize">
+                    {analysis.risk} risk — score {analysis.score}
+                  </AlertTitle>
                   <AlertDescription>
-                    <div className="text-sm text-foreground/70">URL: {normalizeUrl(url) ?? url}</div>
+                    <div className="text-sm text-foreground/70">
+                      URL: {normalizeUrl(url) ?? url}
+                    </div>
                   </AlertDescription>
                 </Alert>
 
@@ -76,12 +116,17 @@ export default function Phishing() {
                       className={`rounded-md border px-3 py-2 text-sm ${c.passed ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-400" : "border-red-500/30 bg-red-500/5 text-red-400"}`}
                     >
                       <div className="font-medium">{c.label}</div>
-                      {c.details && <div className="text-foreground/70">{c.details}</div>}
+                      {c.details && (
+                        <div className="text-foreground/70">{c.details}</div>
+                      )}
                     </div>
                   ))}
                 </div>
 
-                <p className="text-xs text-foreground/60">This is a heuristic analysis and not a guarantee. Combine with network and reputation intelligence for best results.</p>
+                <p className="text-xs text-foreground/60">
+                  This is a heuristic analysis and not a guarantee. Combine with
+                  network and reputation intelligence for best results.
+                </p>
               </div>
             )}
           </CardContent>
