@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { addHistory } from "@/lib/history";
 import { RecentList } from "@/components/history/RecentList";
+import { fetchBinary } from "@/lib/proxy";
 
 function shannonEntropy(data: Uint8ClampedArray) {
   const hist = new Array(256).fill(0);
@@ -23,8 +24,9 @@ function shannonEntropy(data: Uint8ClampedArray) {
 export default function Stego() {
   const [result, setResult] = useState<{ name: string; entropy: number } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [url, setUrl] = useState("");
 
-  async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onUpload(e: React.ChangeEvent<HTMLInputElement> | { target: { files?: File[] | null } }) {
     const file = e.target.files?.[0];
     if (!file) return;
     const img = new Image();
@@ -44,6 +46,34 @@ export default function Stego() {
 
   const risk = result ? (result.entropy > 7.5 ? "high" : result.entropy > 7.0 ? "medium" : "low") : "low";
 
+  async function scanUrl() {
+    if (!url) return;
+    try {
+      const blob = await fetchBinary(url);
+      const file = new File([blob], "remote-image", { type: blob.type });
+      await onUpload({ target: { files: [file] } } as any);
+    } catch (e) { console.error(e); }
+  }
+
+  function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) onUpload({ target: { files: [file] } } as any);
+    else { const text = e.dataTransfer.getData("text"); if (text) { setUrl(text); scanUrl(); } }
+  }
+
+  async function onPaste(e: React.ClipboardEvent<HTMLDivElement>) {
+    const t = e.clipboardData.getData("text");
+    if (t) { setUrl(t); await scanUrl(); return; }
+    const items = e.clipboardData.items as any;
+    for (const it of items) {
+      if (it.type?.startsWith("image/")) {
+        const file = it.getAsFile?.();
+        if (file) await onUpload({ target: { files: [file] } } as any);
+      }
+    }
+  }
+
   return (
     <section className="container py-10">
       <div className="mx-auto max-w-3xl space-y-6">
@@ -53,10 +83,14 @@ export default function Stego() {
         </div>
         <Card className="border-border/60">
           <CardHeader>
-            <CardTitle>Analyze Image</CardTitle>
+            <CardTitle>Analyze Image (Upload/Paste/Drop or URL)</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <Input type="file" accept="image/*" onChange={onUpload} className="max-w-md" />
+          <CardContent className="space-y-3" onDrop={onDrop} onDragOver={(e)=>e.preventDefault()} onPaste={onPaste}>
+            <Input type="file" accept="image/*" onChange={onUpload as any} className="max-w-md" />
+            <div className="flex gap-2">
+              <Input placeholder="https://...image.png" value={url} onChange={(e)=>setUrl(e.target.value)} />
+              <Button variant="secondary" onClick={scanUrl}>Scan URL</Button>
+            </div>
             <canvas ref={canvasRef} className="hidden" />
             {result && (
               <div className={`rounded-md border p-3 text-sm ${risk === "high" ? "border-red-500/30 bg-red-500/5 text-red-400" : risk === "medium" ? "border-amber-500/30 bg-amber-500/5 text-amber-400" : "border-emerald-500/30 bg-emerald-500/5 text-emerald-400"}`}>
