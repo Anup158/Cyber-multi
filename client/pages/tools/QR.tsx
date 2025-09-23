@@ -5,12 +5,14 @@ import { Input } from "@/components/ui/input";
 import { analyzeUrl } from "@shared/security";
 import { addHistory } from "@/lib/history";
 import { RecentList } from "@/components/history/RecentList";
+import { fetchBinary } from "@/lib/proxy";
 
 export default function QR() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [decoded, setDecoded] = useState<string>("");
   const [supported, setSupported] = useState<boolean>(false);
   const [streaming, setStreaming] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
     // @ts-ignore
@@ -74,6 +76,43 @@ export default function QR() {
 
   const insight = decoded && /^(https?:)?\//.test(decoded) ? analyzeUrl(decoded) : null;
 
+  async function scanUrlImage() {
+    if (!imageUrl) return;
+    try {
+      const blob = await fetchBinary(imageUrl);
+      // @ts-ignore
+      if (window.BarcodeDetector) {
+        // @ts-ignore
+        const detector = new window.BarcodeDetector({ formats: ["qr_code"] });
+        const bmp = await createImageBitmap(await blob);
+        const rs = await detector.detect(bmp as any);
+        if (rs && rs[0]) { const v = rs[0].rawValue || ""; setDecoded(v); addHistory("qr", { content: v }); }
+      }
+    } catch (e) { console.error(e); }
+  }
+
+  function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) onUpload({ target: { files: [file] } } as any);
+    else {
+      const text = e.dataTransfer.getData("text");
+      if (text) { setImageUrl(text); scanUrlImage(); }
+    }
+  }
+
+  async function onPaste(e: React.ClipboardEvent<HTMLDivElement>) {
+    const t = e.clipboardData.getData("text");
+    if (t) { setImageUrl(t); await scanUrlImage(); return; }
+    const items = e.clipboardData.items;
+    for (const it of items as any) {
+      if (it.type && it.type.startsWith("image/")) {
+        const file = it.getAsFile?.();
+        if (file) await onUpload({ target: { files: [file] } } as any);
+      }
+    }
+  }
+
   return (
     <section className="container py-10">
       <div className="mx-auto max-w-3xl space-y-6">
@@ -85,13 +124,15 @@ export default function QR() {
           <CardHeader>
             <CardTitle>Scan</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3" onDrop={onDrop} onDragOver={(e)=>e.preventDefault()} onPaste={onPaste}>
             <div className="flex flex-wrap items-center gap-2">
               {supported && (
                 <Button onClick={startCamera}>{streaming ? "Scanning…" : "Start Camera"}</Button>
               )}
-              <div className="text-sm text-foreground/60">or upload image</div>
+              <div className="text-sm text-foreground/60">upload/paste/drag image • or scan by image URL</div>
               <Input type="file" accept="image/*" onChange={onUpload} className="max-w-xs" />
+              <Input placeholder="https://...image.png" value={imageUrl} onChange={(e)=>setImageUrl(e.target.value)} className="max-w-sm" />
+              <Button variant="secondary" onClick={scanUrlImage}>Scan URL</Button>
             </div>
             <video ref={videoRef} className="mt-2 w-full rounded-md border border-border/60" muted playsInline />
             {decoded && (
