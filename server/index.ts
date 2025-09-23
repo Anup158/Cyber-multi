@@ -4,6 +4,7 @@ import cors from "cors";
 import { handleDemo } from "./routes/demo";
 import { handlePhishingAnalyze } from "./routes/phishing";
 import { handlePdfAnalyze } from "./routes/pdf";
+import { handleFetchBinary } from "./routes/proxy";
 
 export function createServer() {
   const app = express();
@@ -24,6 +25,7 @@ export function createServer() {
   // Security APIs
   app.post("/api/phishing/analyze", handlePhishingAnalyze);
   app.post("/api/pdf/analyze", handlePdfAnalyze);
+  app.post("/api/proxy/fetch-binary", handleFetchBinary);
 
   return app;
 }
