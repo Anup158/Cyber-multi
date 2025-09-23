@@ -16,7 +16,7 @@ export default function Phishing() {
 
   return (
     <section className="container py-10">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-3xl" onPaste={(e)=>{ const t=e.clipboardData.getData('text'); if(t){ setUrl(t); } }} onDrop={(e)=>{ e.preventDefault(); const t=e.dataTransfer.getData('text'); if(t){ setUrl(t); } }} onDragOver={(e)=>e.preventDefault()}>
         <div className="flex items-center gap-3">
           <div className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 text-cyan-400 ring-1 ring-inset ring-cyan-500/30">
             <LinkIcon className="h-5 w-5" />
@@ -34,7 +34,7 @@ export default function Phishing() {
           <CardContent className="space-y-3">
             <div className="flex gap-2">
               <Input
-                placeholder="https://example.com/login"
+                placeholder="Paste, drop, or type a URL"
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 autoFocus
