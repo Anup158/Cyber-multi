@@ -38,9 +38,13 @@ Cyber-multi is a full-stack web application designed for robust "agent" manageme
 -   🛡️ **TypeScript Everywhere**: Enhances code quality, readability, and maintainability across the entire codebase.
 
 ## 🖥️ Screenshots
-<img width="1919" height="1015" alt="Screenshot 2026-01-01 120809" src="https://github.com/user-attachments/assets/f27243fa-3237-47d9-9eee-f182adbe883e" />
+<img width="1897" height="1096" alt="Screenshot 2026-01-01 120710" src="https://github.com/user-attachments/assets/c9527fd5-3a0f-43ad-8d7c-7e3b5b10727e" />
 
-<img width="1919" height="1015" alt="image" src="https://github.com/user-attachments/assets/f969ac04-aa03-41d9-a275-089413eca9fb" />
+
+<img width="1919" height="1029" alt="Screenshot 2026-01-01 120739" src="https://github.com/user-attachments/assets/566b0b8f-61e5-4a5c-8e0d-d09455384800" />
+
+
+<img width="1919" height="1015" alt="Screenshot 2026-01-01 120809" src="https://github.com/user-attachments/assets/f27243fa-3237-47d9-9eee-f182adbe883e" />
 
 
 ## 🛠️ Tech Stack
